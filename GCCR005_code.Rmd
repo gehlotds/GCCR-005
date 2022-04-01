@@ -1,0 +1,548 @@
+---
+title: "clean-GCCR005"
+author: "Pari"
+date: '2022-03-28'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Import dataset
+```{r import, include = FALSE}
+library(readr)
+data <- read_csv("GCCR_dataset_parent.csv")
+View(data)
+str(data)
+```
+
+# Count participants who have ever accessed a session.
+118 unique participants. 
+108 accessed 1 session.
+8 accessed 2 sessions.
+1 accessed 5 sessions.
+1 accessed 9 sessions.
+```{r select}
+install.packages("dplyr")
+library(dplyr)
+count_table<- table(data %>% group_by(subjectid) %>% summarize(count=n()))
+data2<-as.data.frame(count_table)
+table(data2$Freq, data2$count)
+```
+
+# Select only participants who provided consent, and count how many accessed sessions
+48 unique participants, who accessed 1 session.
+39 unique participants qualify. 
+```{r select_consent}
+data_consent<-subset(data, consent == 1) 
+str(data_consent)
+count_table_consent<- table(data_consent %>% group_by(subjectid) %>% summarize(count=n()))
+data2_consent<-as.data.frame(count_table_consent)
+table(data2_consent$Freq, data2_consent$count)
+
+data_qualify<- subset(data_consent, qualify == 1) 
+str(data_qualify)
+count_table_qualify<- table(data_qualify %>% group_by(subjectid) %>% summarize(count=n()))
+data2_qualify<-as.data.frame(count_table_qualify)
+table(data2_qualify$Freq, data2_qualify$count)
+
+```
+# Describe the sample which consented and qualified
+39 unique participants with age data. Mean: 40.05, sd: 12.32; 
+32 women, 6 men, 1 other
+
+By looking at the region column, we can see that the vast majority of participants are from the US.
+
+13 unique participants are white, 1 prefers not to answer and 4 are Other. 
+
+19 never smokers, 5 currently smoke, 11 smoked in the past, 2 prefer not to say. 
+
+14 none
+6 high blood pressure
+1 heart disease
+0  diabetes
+3 obesity
+0 lung disease
+0 head trauma
+1 neurological disease
+0 cancer + chemo
+0 cancer - chemo
+1 chronic sinus problems
+0 pre-COVID smell disorders
+0 pre-COVID taste disorders
+11 seasonal allergies
+0 Other
+```{r describe_consent}
+#age
+data_qualify$age<-2021-data_qualify$born
+str(data_qualify)
+mean(data_qualify$age, na.rm = TRUE)
+sd(data_qualify$age, na.rm = TRUE)
+
+#gender
+table(data_qualify$gender)
+
+#ethnicity
+table(data_qualify$ethnicity)
+
+#smoker
+table(data_qualify$smoker_v2)
+
+#pre-existing conditions
+table(data_qualify$conditions_v2___0)
+table(data_qualify$conditions_v2___1)
+table(data_qualify$conditions_v2___2)
+table(data_qualify$conditions_v2___3)
+table(data_qualify$conditions_v2___4)
+table(data_qualify$conditions_v2___5)
+table(data_qualify$conditions_v2___6)
+table(data_qualify$conditions_v2___7)
+table(data_qualify$conditions_v2___8)
+table(data_qualify$conditions_v2___9)
+table(data_qualify$conditions_v2___10)
+table(data_qualify$conditions_v2___11)
+table(data_qualify$conditions_v2___12)
+table(data_qualify$conditions_v2___13)
+table(data_qualify$conditions_v2___88)
+```
+# describe COVID diagnosis
+
+One person did not respond. 36 unique participants had COVID-19 and 2 had not; 31 had a positive lab test, 1 were diagnosed by medics; 1 was not diagnosed by a medical professional; 2 were unknown.
+```{r covid}
+table(data_qualify$covid_diagnosis_v2)
+table(data_qualify$covid_diagnosis_how_v2)
+
+data_qualify_covid<-subset(data_qualify, covid_diagnosis_v2 == 1) 
+str(data_qualify_covid)
+table(data_qualify_covid$covid_diagnosis_how_v2)
+```
+
+# Symptoms during COVID
+
+0 No Symptoms
+20 Fever
+16 Dry Cough
+9 Cough with mucus 
+9 Shortness of breath
+12 Chest tightness
+19 Runny nose
+16 Sore throat
+23 Changes in food flavor
+34 Changes in smell
+30 Changes in taste
+17 Loss of appetite
+27 Headache
+27 Body aches
+28 Fatigue
+12 Diarrhea
+5 Abdominal pain
+8 Nausea
+6 Skin sensitivity
+13 Dry mouth
+8 Other
+```{r covid_symptoms}
+table(data_qualify$resp_sypmtoms_v2___0)
+table(data_qualify$resp_sypmtoms_v2___1)
+table(data_qualify$resp_sypmtoms_v2___2)
+table(data_qualify$resp_sypmtoms_v2___3)
+table(data_qualify$resp_sypmtoms_v2___4)
+table(data_qualify$resp_sypmtoms_v2___5)
+table(data_qualify$resp_sypmtoms_v2___6)
+table(data_qualify$resp_sypmtoms_v2___7)
+table(data_qualify$resp_sypmtoms_v2___8)
+table(data_qualify$resp_sypmtoms_v2___9)
+table(data_qualify$resp_sypmtoms_v2___10)
+table(data_qualify$resp_sypmtoms_v2___11)
+table(data_qualify$resp_sypmtoms_v2___12)
+table(data_qualify$resp_sypmtoms_v2___13)
+table(data_qualify$resp_sypmtoms_v2___14)
+table(data_qualify$resp_sypmtoms_v2___15)
+table(data_qualify$resp_sypmtoms_v2___16)
+table(data_qualify$resp_sypmtoms_v2___17)
+table(data_qualify$resp_sypmtoms_v2___18)
+table(data_qualify$resp_sypmtoms_v2___19)
+table(data_qualify$resp_sypmtoms_v2___88)
+```
+
+# Baseline
+```{r baseline}
+
+str(data_qualify)
+mean(data_qualify$smell_today, na.rm = T) 
+mean(data_qualify$smell_6mo, na.rm = T)
+sd(data_qualify$smell_today, na.rm = T)
+sd(data_qualify$smell_6mo, na.rm = T)
+
+
+mean(data_qualify$blocked_today, na.rm = T)
+mean(data_qualify$blocked_6mo, na.rm = T)
+sd(data_qualify$blocked_today, na.rm = T)
+sd(data_qualify$blocked_6mo, na.rm = T)
+
+mean(data_qualify$taste_today, na.rm = T)
+mean(data_qualify$taste_6mo, na.rm = T)
+sd(data_qualify$taste_today, na.rm = T)
+sd(data_qualify$taste_6mo, na.rm = T)
+
+mean(data_qualify$oralirr_today, na.rm = T)
+mean(data_qualify$oralirr_6mo, na.rm = T)
+sd(data_qualify$oralirr_today, na.rm = T)
+sd(data_qualify$oralirr_6mo, na.rm = T)
+#why didnt she made another 4 columns for smell, taste,blocked and oralirr change
+
+install.packages("ggplot2")
+library(ggplot2)
+# Basic density
+p <- ggplot(data_qualify, aes(x=smell_6mo)) + 
+  geom_density()
+q <- ggplot(data_qualify, aes(x=blocked_6mo)) + 
+  geom_density()
+r <- ggplot(data_qualify, aes(x=taste_6mo)) + 
+  geom_density()
+s <- ggplot(data_qualify, aes(x=oralirr_6mo)) + 
+  geom_density()
+
+a <- ggplot(data_qualify, aes(x=smell_today)) + 
+  geom_density()
+b <- ggplot(data_qualify, aes(x=blocked_today)) + 
+  geom_density()
+c <- ggplot(data_qualify, aes(x=taste_today)) + 
+  geom_density()
+d <- ggplot(data_qualify, aes(x=oralirr_today)) + 
+  geom_density()
+
+```
+#smell_change
+```{r changed during 6 month}
+data_qualify_covid <- data_qualify_covid[data_qualify_covid$subjectid != 101,] # I wanted to delete this row
+#add columns for smell, taste, blocked and oralirr change 
+data_qualify_covid$smell_change <- data_qualify_covid$smell_today - data_qualify_covid$smell_6mo 
+data_qualify_covid$blocked_change <- data_qualify_covid$blocked_today - data_qualify_covid$blocked_6mo 
+data_qualify_covid$taste_change <- data_qualify_covid$taste_today - data_qualify_covid$taste_6mo
+data_qualify_covid$oralirr_change <- data_qualify_covid$oralirr_today - data_qualify_covid$oralirr_6mo
+
+percentage_change <- function(previous, new, as_decimal = FALSE) {
+  x <- ((new - previous) / previous) * 100
+  if (as_decimal) x <- x / 100
+  return(x)
+}
+#here they have named the function as percentage_change and defined its parameters inside the curly bracket and used the name of the function
+
+data_qualify_covid$smell_change_p <-
+  percentage_change(data_qualify_covid$smell_6mo,data_qualify_covid$smell_today )
+
+
+data_qualify_covid$blocked_change_p <- percentage_change(data_qualify_covid$blocked_6mo,data_qualify_covid$blocked_today)
+
+
+data_qualify_covid$taste_change_p <- 
+  percentage_change(data_qualify_covid$taste_6mo,data_qualify_covid$taste_today)
+
+
+data_qualify_covid$oralirr_change_p <- percentage_change(data_qualify_covid$oralirr_6mo,data_qualify_covid$oralirr_today)
+
+mean(data_qualify_covid$smell_change_p, na.rm = T)
+sd(data_qualify_covid$smell_change_p, na.rm = T)
+
+
+e <- ggplot(data_qualify_covid, aes(x=smell_change_p)) + 
+  geom_density(fill = 'cyan', color = 'cyan')+
+  labs(title = 'change in smell from 6 month ago till now') +
+  theme(text = element_text(family = 'Gill Sans', color = "#444444", size = 5)
+        ,panel.background = element_rect(fill = '#444B5A')
+        ,panel.grid.minor = element_line(color = '#4d5566')
+        ,panel.grid.major = element_line(color = '#586174')
+        ,plot.title = element_text(size = 8)
+        ,axis.title = element_text(size = 8, color = '#DDAA33')
+        ,axis.title.y = element_text(vjust = .5, angle = 0)
+        ,axis.title.x = element_text(hjust = .5)
+  ) 
+f <- ggplot(data_qualify_covid, aes(x=blocked_change_p)) + 
+  geom_density(fill = 'cyan', color= 'cyan')+labs(title = 'change in blocked nose') +
+  theme(text = element_text(family = 'Gill Sans', color = "#444444", size = 5)
+        ,panel.background = element_rect(fill = '#444B5A')
+        ,panel.grid.minor = element_line(color = '#4d5566')
+        ,panel.grid.major = element_line(color = '#586174')
+        ,plot.title = element_text(size = 8)
+        ,axis.title = element_text(size = 8, color = '#DDAA33')
+        ,axis.title.y = element_text(vjust = .5, angle = 0)
+        ,axis.title.x = element_text(hjust = .5)
+  ) 
+g <- ggplot(data_qualify_covid, aes(x=taste_change_p)) + 
+  geom_density(fill = 'cyan')+labs(title = 'change in taste from 6 month ago till now') +
+  theme(text = element_text(family = 'Gill Sans', color = "#444444", size = 5)
+        ,panel.background = element_rect(fill = '#444B5A')
+        ,panel.grid.minor = element_line(color = '#4d5566')
+        ,panel.grid.major = element_line(color = '#586174')
+        ,plot.title = element_text(size = 8)
+        ,axis.title = element_text(size = 8, color = '#DDAA33')
+        ,axis.title.y = element_text(vjust = .5, angle = 0)
+        ,axis.title.x = element_text(hjust = .5)
+  ) 
+h <- ggplot(data_qualify_covid, aes(x=oralirr_change_p)) + 
+  geom_density(fill = 'cyan')+labs(title = 'change in trigeminal from 6 month ago till now') +
+  theme(text = element_text(family = 'Gill Sans', color = "#444444", size = 5)
+        ,panel.background = element_rect(fill = '#444B5A')
+        ,panel.grid.minor = element_line(color = '#4d5566')
+        ,panel.grid.major = element_line(color = '#586174')
+        ,plot.title = element_text(size = 8)
+        ,axis.title = element_text(size = 8, color = '#DDAA33')
+        ,axis.title.y = element_text(vjust = .5, angle = 0)
+        ,axis.title.x = element_text(hjust = .5)
+  ) 
+
+install.packages("ggpubr")
+library("ggpubr")
+ggarrange(p, q, r, s, 
+          ncol = 2, nrow = 2)
+
+ggarrange(a, b, c, d, 
+          ncol = 2, nrow = 2)
+
+ggarrange(e, f, g, h, 
+          ncol = 2, nrow = 2)
+```
+#severity
+we did median split to convert the continuous data(number of symptoms for each) to categorical 
+We have to category of severity: if the number of symptoms are between 1-9 we call them L(less severe) and otherwise is S
+severity	/ number of participants: L=Less severe and S= severe
+L	20
+S	16
+```{r severity of covid}
+# create a new coulmn for symptoms frequency
+data_qualify_covid$symptomfreq <- ""
+data_qualify_covid$symptomfreq <- rowSums(data_qualify_covid[ , c(44:63)], na.rm=TRUE)
+data_qualify_covid$symptomfreq
+#create a new column for severity
+data_qualify_covid$severity <- ""
+
+data_qualify_covid$severity[data_qualify_covid$symptomfreq <= 9] <- "L"
+data_qualify_covid$severity[data_qualify_covid$symptomfreq > 9] <- "S"                            
+data_qualify_covid$severity             
+data_qualify_covid
+
+#make a new data set with all the columns that interest us for analysis the data related to smell cange and symptoms
+p_dataset <- data_qualify_covid[c('subjectid', 'symptomfreq', 'severity','smell_change_p', 'blocked_change_p', 'taste_change_p', 'oralirr_change_p', 'smell_change', 'blocked_change', 'taste_change', 'oralirr_change')]
+
+# clean the data
+#pt 0 for inf NAN...
+p_dataset <- p_dataset %>% mutate_if(is.numeric, function(x) ifelse(is.infinite(x), 0, x))
+#p_dataset <- replace(p_dataset, is.na(p_dataset),0 )
+
+
+#mean and sd for changes
+library(dplyr)
+
+mean(p_dataset$smell_change_p, na.rm = T)
+sd(p_dataset$smell_change_p, na.rm = T)
+
+
+mean(p_dataset$taste_change_p, na.rm = T)
+sd(p_dataset$taste_change_p, na.rm = T)
+
+
+mean(p_dataset$oralirr_change_p, na.rm = T)
+sd(p_dataset$oralirr_change_p, na.rm = T)
+
+
+mean(p_dataset$blocked_change_p, na.rm = T)
+sd(p_dataset$blocked_change_p, na.rm = T)
+
+
+#mixmodel
+#we used a mix model to see the correlation between severity and changes in smell/taste/blocked/oralirr
+#there is no significant correlation. The only significant one is the Trigeminal change (oralirr) with the p-value: 0.0412.
+lm1 <- lm(smell_change_p ~ severity, p_dataset)
+lm2 <- lm(blocked_change_p ~ severity, p_dataset)
+lm3 <- lm(taste_change_p ~ severity, p_dataset)
+lm4 <- lm(oralirr_change_p ~ severity, p_dataset)
+
+#look at the summary
+summary(lm1)
+summary(lm2)
+summary(lm3)
+summary(lm4)
+```
+#severity pie chart
+```{r piechart}
+# Pie Chart with Percentages
+slices <- c(20,16)
+
+lbls <- c("Less severe","Sever")
+
+pct <- round(slices/sum(slices)*100)
+lbls <- paste(lbls, pct) # add percents to labels
+lbls <- paste(lbls,"%",sep="") # ad % to labels
+pie(slices,labels = lbls, col=rainbow(length(lbls)),main="Symptoms frequency")
+```
+
+```{R symptoms freq}
+#doughnut piechaet for symptoms freq
+slices1 <- c(34, 30, 28, 27, 27, 23, 20, 19, 17, 16, 16, 16, 13, 12, 12, 9, 8, 8, 6, 5)
+names1 <- c("Changes in or loss of smell", "Changes in or loss of taste", "Fatigue", "Body ache", "Headache", "Change in food flavour", "Feaver", "Runny nose", "Loss of appetite", "Dry cough", "Couch with mucous", "Sore throat" , "Dry mouth", "Chest tightness", "Diarrhoea", "Difficulty breathing", "Nausea", "Other", "Skin sinsitivity", "Abdominal pain" )
+pct1 <- round(slices1/sum(slices1)*100)
+lbls <- paste(names1, pct1)
+data_doughnut <- data.frame(slices1, names1)
+
+donut <-  ggplot(data = data_doughnut, aes(x=2, y = pct1, fill = color))+
+       geom_col(color = "black") +
+       coord_polar("y", start = 0) + 
+       geom_text(aes(label = paste0(pct1, "%")), 
+                          position = position_stack(vjust = 0.5)) +
+       theme(panel.background = element_blank(),
+             axis.line = element_blank(),
+             axis.text = element_blank(),
+             axis.ticks = element_blank(),
+             axis.title = element_blank(), 
+             plot.title = element_text(hjust = 0.5, size = 18)) +
+       ggtitle("Symptoms frequency") +
+       scale_fill_manual(values = pct1) +
+       xlim(0.5, 2.5)
+
+
+```
+
+#see the correlation between intensity and self-reported olfactory
+```{r intensity}
+
+
+res <- cor.test(data_qualify_covid$oralirritation_intensity, data_qualify_covid$oralirr_today, 
+                method = "pearson", use = "complete.obs")
+res
+res1 <- cor.test(data_qualify_covid$smell_cosmetics_intensity, data_qualify_covid$smell_today, 
+                 method = "pearson", use = "complete.obs")
+res1
+res2 <- cor.test(data_qualify_covid$smell_spice_intensity, data_qualify_covid$smell_today, 
+                 method = "pearson", use = "complete.obs")
+res2
+res <- cor.test(data_qualify_covid$taste_sweet_intensity, data_qualify_covid$taste_today, 
+                method = "pearson", use = "complete.obs")
+res
+res <- cor.test(data_qualify_covid$taste_salt_intensity, data_qualify_covid$taste_today, 
+                method = "pearson", use = "complete.obs")
+res
+res <- cor.test(data_qualify_covid$taste_sour_intensity, data_qualify_covid$taste_today, 
+                method = "pearson", use = "complete.obs")
+res
+res <- cor.test(data_qualify_covid$taste_bitter_intensity, data_qualify_covid$taste_today, 
+                method = "pearson", use = "complete.obs")
+res
+
+
+
+#the oral intensity mean and sd:
+mean(data_qualify_covid$oralirritation_intensity, na.rm = T)
+sd(data_qualify_covid$oralirritation_intensity, na.rm = T)
+#smell intensity
+mean(data_qualify_covid$smell_cosmetics_intensity, na.rm = T)
+sd(data_qualify_covid$smell_cosmetics_intensity, na.rm = T)
+
+mean(data_qualify_covid$smell_spice_intensity, na.rm = T)
+sd(data_qualify_covid$smell_spice_intensity, na.rm = T)
+
+#taste intensity
+data_qualify_covid$taste_sweet_intensity
+mean(data_qualify_covid$taste_sweet_intensity, na.rm = T)
+sd(data_qualify_covid$taste_sweet_intensity, na.rm = T)
+data_qualify_covid$taste_salt_intensity
+mean(data_qualify_covid$taste_salt_intensity, na.rm = T)
+sd(data_qualify_covid$taste_salt_intensity, na.rm = T)
+data_qualify_covid$taste_sour_intensity
+mean(data_qualify_covid$taste_sour_intensity, na.rm = T)
+sd(data_qualify_covid$taste_sour_intensity, na.rm = T)
+data_qualify_covid$taste_bitter_intensity
+mean(data_qualify_covid$taste_bitter_intensity, na.rm = T)
+sd(data_qualify_covid$taste_bitter_intensity, na.rm = T)
+
+
+
+# pearson
+
+#correlation between taste intensity and severity
+res <- cor.test(data_qualify_covid$oralirritation_intensity, data_qualify_covid$symptomfreq, 
+                method = "pearson", use = "complete.obs")
+res
+res1 <- cor.test(data_qualify_covid$smell_cosmetics_intensity, data_qualify_covid$symptomfreq, 
+                 method = "pearson", use = "complete.obs")
+res1
+res2 <- cor.test(data_qualify_covid$smell_spice_intensity, data_qualify_covid$symptomfreq, 
+                 method = "pearson", use = "complete.obs")
+res2
+res <- cor.test(data_qualify_covid$taste_sweet_intensity, data_qualify_covid$symptomfreq, 
+                method = "pearson", use = "complete.obs")
+res
+res <- cor.test(data_qualify_covid$taste_salt_intensity, data_qualify_covid$symptomfreq, 
+                method = "pearson", use = "complete.obs")
+res
+res <- cor.test(data_qualify_covid$taste_sour_intensity, data_qualify_covid$symptomfreq, 
+                method = "pearson", use = "complete.obs")
+res
+res <- cor.test(data_qualify_covid$taste_bitter_intensity, data_qualify_covid$symptomfreq, 
+                method = "pearson", use = "complete.obs")
+res
+
+
+#plot
+#bar plot for severity and bitter
+barplot <-ggplot(data_qualify_covid, aes(fill=severity, y=taste_bitter_intensity, x=symptomfreq)) + 
+  geom_bar(position="dodge", stat="identity")
+barplot
+#bar plot for severity and bitter
+barplot <-ggplot(data_qualify_covid, aes(fill=severity, y=taste_salt_intensity, x=symptomfreq)) + 
+  geom_bar(position="dodge", stat="identity")
+barplot
+#bar plot for severity and bitter
+barplot <-ggplot(data_qualify_covid, aes(fill=severity, y=taste_sour_intensity, x=symptomfreq)) + 
+  geom_bar(position="dodge", stat="identity")
+barplot
+#bar plot for severity and bitter
+barplot <-ggplot(data_qualify_covid, aes(fill=severity, y=taste_sweet_intensity, x=symptomfreq)) + 
+  geom_bar(position="dodge", stat="identity")
+barplot
+```
+# Multiple plots for severity and chemosensory changes
+```{r plot}
+           
+
+ 
+p1 <- ggscatter(p_dataset,
+          x = "symptomfreq",
+          y = "smell_change_p",
+          xlab = "Symptoms frequency", 
+          ylab = "Smell change",
+          color = "severity",
+          add = "reg.line") +
+  stat_cor(aes(color = severity),method = "spearman", label.x = 3) 
+
+p2 <-  ggscatter(p_dataset,
+          x = "symptomfreq",
+          y = "taste_change_p",
+          xlab = "Symptoms frequency", 
+          ylab = "Taste change",  
+          color = "severity",
+          add = "reg.line") +
+  stat_cor(aes(color = severity),method = "spearman", label.x = 3) 
+
+p3 <-  ggscatter(p_dataset,
+          x = "symptomfreq",
+          y = "blocked_change_p",
+          xlab = "Symptoms frequency", 
+          ylab = "Blocked change",   
+          color = "severity",
+          add = "reg.line") +
+  stat_cor(aes(color = severity),method = "spearman", label.x = 3) 
+
+
+p4 <-  ggscatter(p_dataset,
+          x = "symptomfreq",
+          y = "oralirr_change_p",
+          color = "severity",
+          xlab = "Symptoms frequency", 
+          ylab = "Oral irritation change",   
+          add = "reg.line") +
+  stat_cor(aes(color = severity),method = "spearman", label.x = 3)
+
+ggarrange(p1, p2,p3,p4, ncol = 2, nrow = 2)  
+
+```
