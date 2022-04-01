@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # Import dataset
 ```{r import, include = FALSE}
 library(readr)
-data <- read_csv("GCCR_dataset_parent.csv")
+data <- read_csv("GCCR005_dataset_main.csv")
 View(data)
 str(data)
 ```
