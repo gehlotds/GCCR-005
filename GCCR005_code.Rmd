@@ -23,6 +23,7 @@ str(data)
 8 accessed 2 sessions.
 1 accessed 5 sessions.
 1 accessed 9 sessions.
+
 ```{r select}
 install.packages("dplyr")
 library(dplyr)
@@ -73,6 +74,7 @@ By looking at the region column, we can see that the vast majority of participan
 0 pre-COVID taste disorders
 11 seasonal allergies
 0 Other
+
 ```{r describe_consent}
 #age
 data_qualify$age<-2021-data_qualify$born
@@ -109,6 +111,7 @@ table(data_qualify$conditions_v2___88)
 # describe COVID diagnosis
 
 One person did not respond. 36 unique participants had COVID-19 and 2 had not; 31 had a positive lab test, 1 were diagnosed by medics; 1 was not diagnosed by a medical professional; 2 were unknown.
+
 ```{r covid}
 table(data_qualify$covid_diagnosis_v2)
 table(data_qualify$covid_diagnosis_how_v2)
@@ -166,6 +169,7 @@ table(data_qualify$resp_sypmtoms_v2___88)
 ```
 
 # Baseline
+
 ```{r baseline}
 
 str(data_qualify)
@@ -214,6 +218,7 @@ d <- ggplot(data_qualify, aes(x=oralirr_today)) +
 
 ```
 #smell_change
+
 ```{r changed during 6 month}
 data_qualify_covid <- data_qualify_covid[data_qualify_covid$subjectid != 101,] # I wanted to delete this row
 #add columns for smell, taste, blocked and oralirr change 
@@ -309,6 +314,7 @@ We have to category of severity: if the number of symptoms are between 1-9 we ca
 severity	/ number of participants: L=Less severe and S= severe
 L	20
 S	16
+
 ```{r severity of covid}
 # create a new coulmn for symptoms frequency
 data_qualify_covid$symptomfreq <- ""
@@ -404,6 +410,7 @@ donut <-  ggplot(data = data_doughnut, aes(x=2, y = pct1, fill = color))+
 ```
 
 #see the correlation between intensity and self-reported olfactory
+
 ```{r intensity}
 
 
@@ -502,6 +509,7 @@ barplot <-ggplot(data_qualify_covid, aes(fill=severity, y=taste_sweet_intensity,
 barplot
 ```
 # Multiple plots for severity and chemosensory changes
+
 ```{r plot}
            
 
